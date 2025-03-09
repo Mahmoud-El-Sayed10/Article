@@ -12,7 +12,11 @@ $db = "article";
 $conn = new mysqli($host, $user, $password, $db);
 
 if($conn->connect_error){
-    die("Connection failed:" . $conn->connect_error);
+    http_response_code(500);
+    die(json_encode([
+        "success" => false,
+        "message" => "Connection error: " . $conn->connect_error
+    ]));
 }
 
 ?>

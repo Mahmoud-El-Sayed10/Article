@@ -1,11 +1,12 @@
 <?php
 
-require("../connection.php");
-// $body = json_decode(file_get_contents("php://input"), true);
+require_once(__DIR__ . "/../../connection/connection.php");
+require_once(__DIR__ . "/../../Models/User.php");
 
 if(!isset($_POST["email"]) || !isset($_POST["password"])){
     http_response_code(400);
     echo json_encode([
+        "success" => false,
         "message" => "email and password are required"
     ]);
 
@@ -13,35 +14,29 @@ if(!isset($_POST["email"]) || !isset($_POST["password"])){
 }
 
 $email = $_POST["email"];
-$password = $_PPOST["password"];
+$password = $_POST["password"];
 
 try{
-    $query = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $query->bind_param("s","email");
-    $query->execute();
+    $user = User::login($email, $password);
 
-    $result = $query->get_result();
-
-    $user = $result->fetch_assoc();
-
-    if(password_verify($password, $user["password"])){
+    if($user){
         echo json_encode([
-            "user" => $user,
+            "success" => true,
+            "user" => $user->toArray(),
         ]);
-    } else {
+    } else{
         http_response_code(401);
-
         echo json_encode([
-            "messahe" => "Invalid email or password"
+            "success" => false,
+            "message" => "Invalid email or password"
         ]);
-    } 
+    }
 } catch (\Throwable $e){
-    http_response_code(400);
-
+    http_response_code(500);
     echo json_encode([
-        "message" => $e ->getMessage()
+        "success" => false,
+        "message" => $e->getMessage()
     ]);
 }
-
 
 ?>

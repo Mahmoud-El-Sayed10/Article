@@ -1,40 +1,43 @@
 <?php
- require ("../connection.php");
 
- if(!isset($_POST["email"]) || !isset($_POST["password"])){
+require_once(__DIR__ . "/../../connection/connection.php");
+require_once(__DIR__ . "/../../Models/User.php");
+
+if(!isset($_POST["email"]) || !isset($_POST["password"]) || !isset($_POST["fullname"])){
     http_response_code(400);
     echo json_encode([
-        "message" => "email and password are required"
+        "success" => false,
+        "message" => "email, password and fullname are required"
     ]);
+
     exit();
- }
+}
 
- $email = $_POST["email"];
- $password = $_POST["password"];
+$email = $_POST["email"];
+$password = $_POST["password"];
+$fullname = $_POST["fullname"];
 
- //Validation for existing email
+try{
+  $user = User::create($email, $password, $fullname);
 
- $hashed = hash('sha256', $password);
-  try{
-    $query = $conn->prepare("INSERT INTO users (email, password) VALUES (?,?)");
-    $query->bind_param("ss", $email, $hashed);
-    $query->execute();
-
-    $query = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $query->bind_param("s", $email);
-    $query->execute();
-
-    $result = $query->get_result();
-    $user = $result->fetch_assoc();
-
-    echo json_encode([
-        "user"=>$user,
-    ]);
-  } catch (\Throwable $e){
-        http_response_code(400);
-
-        echo json_encode([
-            "message" => $e ->getMessage()
-        ]);
+  if(User::save($user)){
+      echo json_encode([
+          "success" => true,
+          "user" => $user->toArray()
+      ]);
+  } else {
+      http_response_code(500);
+      echo json_encode([
+          "success"=>false,
+          "message"=>"Failed to save user"
+      ]);
   }
+} catch (\Throwable $e){
+  http_response_code(500);
+  echo json_encode([
+      "success" => false,
+      "message" => $e->getMessage()
+  ]);
+}
+
 ?>
