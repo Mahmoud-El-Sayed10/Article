@@ -15,7 +15,7 @@ if(isLoginPage){
         form.append('password', passwordInput.value);
         try{
             const response = await axios.post(
-                '/Article/article-server/APIs/v1/login.php',
+                'http://localHost/Article/article-server/APIs/v1/login.php',
                 form
             );
 
@@ -49,7 +49,7 @@ if(isSignupPage){
         form.append('fullname', fullnameInput.value);
         try{
             const response = await axios.post(
-                '/Article/article-server/APIs/v1/signup.php',
+                'http://localHost/Article/article-server/APIs/v1/signup.php',
                 form
             );
 
@@ -75,7 +75,7 @@ if(isFaqPage){
     const loadQuestions = async () => {
         try{
             const response = await axios.get(
-                '/Article/article-server/APIs/v1/getQuestions.php.php'
+                'http://localHost/Article/article-server/APIs/v1/getQuestions.php',
             );
             console.log('API Response:', response.data);
 
@@ -147,7 +147,7 @@ if(isAddQuestionPage){
         try{
 
                 const response = await axios.post(
-                '/Article/article-server/APIs/v1/addQuestion.php',
+                'http://localHost/Article/article-server/APIs/v1/addQuestion.php',
                 {
                     question: question,
                     answer: answer
